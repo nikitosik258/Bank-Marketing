@@ -10,7 +10,7 @@
 - **Контакт:** `contact`, `month`, `day`
 - **Маркетинг:** `campaign`, `previous`, `pdays`, `poutcome`
 - **Инженерные:**  `pdays_never = (pdays == -1)`, `campaign_bins` (биннинг `campaign`)
-**Важно:** duration исключён из обучения (утечка — известен только после звонка). day используется лишь для сортировки по времени.
+- **Важно:** duration исключён из обучения (утечка — известен только после звонка). day используется лишь для сортировки по времени.
 
 ## EDA (главные выводы)
 - **Дисбаланс таргета:** класс `yes` ≈ **11%**.  
@@ -43,6 +43,6 @@
   `learning_rate=0.02`, `max_depth=5`, `min_child_samples=20`, `n_estimators=400`, `num_leaves=7`.  
 - **Прирост:** **PR-AUC +0.007**
 
-**Конечные метрики:**
+- **Конечные метрики:**
 <img width="559" height="72" alt="image" src="https://github.com/user-attachments/assets/ba12ffbd-bd91-436a-bff7-a1af1da7cff4" />
 
