@@ -44,5 +44,6 @@
 - **Прирост:** **PR-AUC +0.007**
 
 - **Конечные метрики:**
-<img width="559" height="72" alt="image" src="https://github.com/user-attachments/assets/ba12ffbd-bd91-436a-bff7-a1af1da7cff4" />
+<img width="690" height="83" alt="image" src="https://github.com/user-attachments/assets/6b71fb3f-c18a-4d83-a6df-86a22917c2f0" />
+
 
