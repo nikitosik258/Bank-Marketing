@@ -14,7 +14,7 @@
 
 ## EDA (главные выводы)
 - **Дисбаланс таргета:** класс `yes` ≈ **11%**.  
-- По категориям: доминируют `cellular`, пик обращений — **may**, `poutcome='unknown'`; в `job` перекос в `blue-collar/management`.  
+- **По категориям:** доминируют `cellular`, пик обращений — **may**, `poutcome='unknown'`; в `job` перекос в `blue-collar/management`.  
 - Много `pdays = -1` → добавлен флаг **`pdays_never`**.  
 - Временной порядок задаётся как `month*100 + day` (год отсутствует).
 
@@ -23,6 +23,7 @@
 - **Ключевая метрика:** **PR-AUC** (из-за дисбаланса).
 - **Модели и результаты:**
 <img width="710" height="205" alt="image" src="https://github.com/user-attachments/assets/eeb7db9d-b822-41ae-95ab-678ecb456b66" />
+ 
  - **Важности (деревья):** month, poutcome, contact, campaign_bins, previous, pdays_never, затем balance/age.
 
 ## Improvements
