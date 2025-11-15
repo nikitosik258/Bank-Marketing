@@ -159,66 +159,60 @@ def plot_numeric_relationship(
 
 
 def plot_classification_results(metrics, model_name="Model"):
-    """
-    Plot classification evaluation results
+    """Plot confusion matrix, PR and ROC curves side-by-side without layout glitches."""
 
-    Parameters:
-    -----------
-    metrics : dict
-        Dictionary containing all metrics (output from calculate_classification_metrics)
-    model_name : str, optional
-        Name of the model for display purposes
-    """
-    plt.figure(figsize=(15, 6))
-
+    # какие панели реально есть
     has_cm  = 'Confusion Matrix' in metrics
-    has_roc = ('ROC Curve' in metrics) and (metrics.get('ROC AUC') is not None)
     has_pr  = ('PR Curve'  in metrics) and (metrics.get('PR AUC')  is not None)
+    has_roc = ('ROC Curve' in metrics) and (metrics.get('ROC AUC') is not None)
 
-    panels = int(has_cm) + int(has_roc) + int(has_pr)
-    if panels == 0:
+    panels = [p for p, ok in (('cm', has_cm), ('pr', has_pr), ('roc', has_roc)) if ok]
+    n = len(panels)
+    if n == 0:
         return
 
-    plt.figure(figsize=(6 * panels, 5))
-    slot = 1
+    fig, axes = plt.subplots(1, n, figsize=(5.5 * n, 4.8))
+    if n == 1:
+        axes = [axes]  # унифицируем индексацию
 
-    # Plot 1: Confusion Matrix
-    if 'Confusion Matrix' in metrics:
-        plt.subplot(1, 2, 1)
-        sns.heatmap(metrics['Confusion Matrix'], annot=True, fmt='d', cmap='Blues',
-                    xticklabels=['Predicted Negative', 'Predicted Positive'],
-                    yticklabels=['Actual Negative', 'Actual Positive'])
-        plt.title(f'{model_name} - Confusion Matrix', fontsize=14)
-        plt.xlabel('Predicted Label', fontsize=12)
-        plt.ylabel('True Label', fontsize=12)
+    ax_idx = 0
 
-    # Plot 2: ROC Curve (if available)
-    if 'ROC Curve' in metrics:
-        roc_data = metrics['ROC Curve']
-        plt.subplot(1, 2, 2)
-        plt.plot(roc_data['fpr'], roc_data['tpr'], color='darkorange', lw=2,
-                 label=f'ROC curve (AUC = {metrics["ROC AUC"]:.2f})')
-        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate', fontsize=12)
-        plt.ylabel('True Positive Rate', fontsize=12)
-        plt.title('Receiver Operating Characteristic', fontsize=14)
-        plt.legend(loc="lower right")
+    # 1) Confusion matrix
+    if has_cm:
+        ax = axes[ax_idx]; ax_idx += 1
+        sns.heatmap(
+            metrics['Confusion Matrix'],
+            annot=True, fmt='d', cmap='Blues', cbar=True, ax=ax,
+            xticklabels=['Predicted 0', 'Predicted 1'],
+            yticklabels=['Actual 0',   'Actual 1']
+        )
+        ax.set_title(f'{model_name}: Confusion Matrix')
+        ax.set_xlabel('Predicted label'); ax.set_ylabel('True label')
 
-    if 'PR Curve' in metrics:
-        pr_data = metrics['PR Curve']  # {'precision': ..., 'recall': ..., 'thresholds': ...}
-        plt.subplot(1, panels, slot)
-        plt.plot(pr_data['recall'], pr_data['precision'], lw=2,
-                 label=f'AP = {metrics["PR AUC"]:.2f}')
-        plt.xlim([0.0, 1.0]); plt.ylim([0.0, 1.05])
-        plt.xlabel('Recall', fontsize=12)
-        plt.ylabel('Precision', fontsize=12)
-        plt.title('Precision–Recall Curve', fontsize=14)
-        plt.legend(loc="lower left")
+    # 2) Precision–Recall
+    if has_pr:
+        pr = metrics['PR Curve']
+        ax = axes[ax_idx]; ax_idx += 1
+        ax.plot(pr['recall'], pr['precision'], lw=2, label=f'AP = {metrics["PR AUC"]:.2f}')
+        ax.set_xlim(0.0, 1.0); ax.set_ylim(0.0, 1.05)
+        ax.set_xlabel('Recall'); ax.set_ylabel('Precision')
+        ax.set_title('Precision-Recall Curve')
+        ax.legend(loc='lower left')
 
-    plt.tight_layout()
+    # 3) ROC
+    if has_roc:
+        roc = metrics['ROC Curve']
+        ax = axes[ax_idx]
+        ax.plot(roc['fpr'], roc['tpr'], lw=2, label=f'AUC = {metrics["ROC AUC"]:.2f}')
+        ax.plot([0, 1], [0, 1], linestyle='--', lw=1)
+        ax.set_xlim(0.0, 1.0); ax.set_ylim(0.0, 1.05)
+        ax.set_xlabel('False Positive Rate'); ax.set_ylabel('True Positive Rate')
+        ax.set_title('ROC Curve')
+        ax.legend(loc='lower right')
+
+    fig.tight_layout()
     plt.show()
+
 
 
 def print_classification_report(metrics, model_name="Model"):
